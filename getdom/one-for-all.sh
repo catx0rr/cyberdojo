@@ -13,22 +13,22 @@ function get_domain
 
 function download_index
 {
-	mkdir one-for-all
-	wget $DOM -O one-for-all/$DOM.txt -q
+	mkdir -p one-for-all/$DOM
+	wget $DOM -O one-for-all/$DOM/$DOM.html -q
 }
 
 function get_subdomain_ips
 {
 	# Subdomains
 	echo -e "\nSubdomains:"
-	grep -o '[A-Za-z0-9_\.-]'*$DOM one-for-all/$DOM.txt | sort -u | tee -a \
-	one-for-all/subdomains.$DOM.txt
+	grep -o '[A-Za-z0-9_\.-]'*$DOM one-for-all/$DOM/$DOM.html | sort -u \
+    | tee -a one-for-all/$DOM/subdomains.$DOM.txt
 
 	# Subdomain host IPs
 	echo -e "\nIP Addresses:"
-	for url in $(cat one-for-all/subdomains.$DOM.txt); do host $url; done \
+	for url in $(cat one-for-all/$DOM/subdomains.$DOM.txt); do host $url; done \
 	| grep "has address " | awk '{print $4}'| sort -u \
-	| tee -a one-for-all/ipadd.$DOM.txt
+	| tee -a one-for-all/$DOM/ipadd.$DOM.txt
 }
 
 function main
