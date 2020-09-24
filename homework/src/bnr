@@ -15,6 +15,6 @@ function show_banner
 	clear
 	echo -e "$banner\n"
 	echo -e "Author: catx0rr
-Github: https://github.com/catx0rr/cyberdojo/tree/master/recon.sh
+Github: https://github.com/catx0rr/cyberdojo/tree/master/recon
 "
 }

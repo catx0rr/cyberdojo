@@ -9,7 +9,7 @@
 # | CyberDojo |
 #
 # Author: catx0rr 
-# Github: https://github.com/catx0rr/cyberdojo/tree/master/recon.sh
+# Github: https://github.com/catx0rr/cyberdojo/tree/master/recon
 #
 # Disclaimer: 
 #	This script is for educational purposes only. Use at your own discretion
