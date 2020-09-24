@@ -1,0 +1,31 @@
+##
+
+. banner 2>/dev/null
+. baselib 2>/dev/null
+
+function set_enum_config
+{
+	show_banner
+	echo -e "Your current configuration file:
+	
+[>] Target IP Address: $HOST
+[>] Target Ports: 1-$PORT
+[>] Target Domain: $DOMAIN
+
+"
+	read -p "Do you want to change your configuration?[y/N]: " getopt
+	
+	case $getopt in
+		[yY]|[yY][eE][sS])
+			echo null
+			;;
+		[nN]|[nN][oO])
+			clear
+			show_banner
+			show_menu
+			;;
+		*)
+			set_enum_config
+			;;	
+	esac
+}

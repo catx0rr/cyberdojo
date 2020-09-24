@@ -22,7 +22,7 @@ function get_subdomain_ips
 	# Subdomains
 	echo -e "\nSubdomains:"
 	grep -o '[A-Za-z0-9_\.-]'*$DOM one-for-all/$DOM/$DOM.html | sort -u \
-    | tee -a one-for-all/$DOM/subdomains.$DOM.txt
+	| tee -a one-for-all/$DOM/subdomains.$DOM.txt
 
 	# Subdomain host IPs
 	echo -e "\nIP Addresses:"
