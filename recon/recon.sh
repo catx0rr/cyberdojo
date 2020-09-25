@@ -25,7 +25,7 @@ path=$(dirname `which $0`)
 . $path/src/bnr
 . $path/src/lib
 . $path/src/proc
-. $path/conf/enum.conf
+. $path/conf/recon.conf
 
 
 function main
