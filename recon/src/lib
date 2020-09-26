@@ -28,8 +28,9 @@ function show_selection
 [2] Enumerate a Domain
 [3] Pingsweep
 [4] Portscan
-[5] Help Screen
-[6] Exit
+[5] Nmap Scan (Requires sudo)
+[6] Help Screen
+[0] Exit
 "
 
 }
@@ -43,7 +44,7 @@ function show_help_screen
 
 [*] Target IP Address:
 [+] HELP: IP address to be used on port scanning.
-          IP address CIDR is also used for ping sweeping.
+          IP address subnet is also used for ping sweeping.
 
 [*] Target Ports:
 [+] HELP: Ports specified, start from 1 to set port will be scanned.
@@ -93,10 +94,13 @@ function show_menu
 		4|[pP][sS][cC])
 			start_port_scan
 			;;
-		5|[h|H]|[hH][eE][lL][pP]) 
+		5|[nN][mM][aA][pP])
+			start_nmap_scan
+			;;
+		6|[hH][eE][lL][pP]) 
 			show_help_screen
 			;;
-		6|[q|Q]|[eE][xX][iI][tT])	
+		0|[eE][xX][iI][tT])	
 			exit 0
 			;;
 		*)
@@ -177,5 +181,8 @@ function validate_config
 
 	# validate the web domain configuration
 	dom_err
+
+	# validate for nmap
+	nmap_err
 }
 
