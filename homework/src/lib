@@ -1,35 +1,99 @@
-##
-. proc 2>/dev/null
+#!/bin/bash
 
-function show_menu 
+function show_banner
 {
-	echo -e "\nPlease Select a Task to Execute:\n
-[1] Change Configuration
+    banner='
+ ██▀███  ▓█████  ▄████▄   ▒█████   ███▄    █        ██████  ██░ ██
+▓██ ▒ ██▒▓█   ▀ ▒██▀ ▀█  ▒██▒  ██▒ ██ ▀█   █      ▒██    ▒ ▓██░ ██▒
+▓██ ░▄█ ▒▒███   ▒▓█    ▄ ▒██░  ██▒▓██  ▀█ ██▒     ░ ▓██▄   ▒██▀▀██░
+▒██▀▀█▄  ▒▓█  ▄ ▒▓▓▄ ▄██▒▒██   ██░▓██▒  ▐▌██▒       ▒   ██▒░▓█ ░██
+░██▓ ▒██▒░▒████▒▒ ▓███▀ ░░ ████▓▒░▒██░   ▓██░ ██▓ ▒██████▒▒░▓█▒░██▓
+░ ▒▓ ░▒▓░░░ ▒░ ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ▒ ▒  ▒▓▒ ▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒
+  ░▒ ░ ▒░ ░ ░  ░  ░  ▒     ░ ▒ ▒░ ░ ░░   ░ ▒░ ░▒  ░ ░▒  ░ ░ ▒ ░▒░ ░
+  ░░   ░    ░   ░        ░ ░ ░ ▒     ░   ░ ░  ░   ░  ░  ░   ░  ░░ ░
+   ░        ░  ░░ ░          ░ ░           ░   ░        ░   ░  ░  ░
+                ░                              ░                   '
+
+    clear
+    echo -e "$banner\n"
+    echo -e "Author: catx0rr
+Github: https://github.com/catx0rr/cyberdojo/tree/master/recon
+"
+}
+
+function show_selection
+{
+    echo -e "Please Select a Task to Execute:\n
+[1] View Configuration
 [2] Enumerate a Domain
 [3] Pingsweep
 [4] Portscan
-[5] Exit
+[5] Help Screen
+[6] Exit
+"
+
+}
+
+function show_help_screen
+{
+    show_banner
+    echo -e " >> HELP SCREEN <<
+
+[+] Configuration Settings
+
+[*] Target IP Address:
+[+] HELP: IP address to be used on port scanning.
+          IP address CIDR is also used for ping sweeping.
+
+[*] Target Ports:
+[+] HELP: Ports specified, start from 1 to set port will be scanned.
+
+[*] Target Domain:
+[+] HELP: Targets the website domain, sweeps for subdomains and translates
+          it to targetable IP addresses.
+
+[*] Output File:
+[+] HELP: All output file will be sent to output directory.
 
 "
-	read -p ">> " opt
 
-	case $opt in
-		1)
+    read -p ">> " getopt
+
+    case $getopt in
+        *)
+            clear
+            show_menu
+            ;;
+    esac
+}
+
+function show_menu 
+{
+	# Load new conf
+	. $path/config/recon.conf
+	
+	show_banner
+	show_selection	
+
+	read -p ">> " getopt
+
+	case $getopt in
+		1|[cC][oO][nN][fF][iI][gG])
 			set_enum_config
 			;;
-		2)
-			echo null
-			show_menu
+		2|[eE][nN][uU][mM])
+			start_enum_domain
 			;;
-		3)
-			echo null
-			show_menu
+		3|[pP][sS][wW])
+			start_ping_sweep
 			;;
-		4)
-			echo null
-			show_menu
+		4|[pP][sS][cC])
+			start_port_scan
 			;;
-		5) 
+		5|[h|H]|[hH][eE][lL][pP]) 
+			show_help_screen
+			;;
+		6|[q|Q]|[eE][xX][iI][tT])	
 			exit 0
 			;;
 		*)
@@ -38,30 +102,63 @@ function show_menu
 	esac
 }
 
-
 function set_enum_config
 {
+	# Load new conf file
+	. $path/config/recon.conf
+    
 	show_banner
-	echo -e "Your current configuration file:
-	
+    echo -e "Your current configuration:
+
 [>] Target IP Address: $HOST
 [>] Target Ports: 1-$PORT
 [>] Target Domain: $DOMAIN
-
 "
-	read -p "Do you want to change your configuration?[y/N]: " getopt
-	
-	case $getopt in
-		[yY]|[yY][eE][sS])
-			echo null
-			;;
-		[nN]|[nN][oO])
-			clear
-			show_banner
-			show_menu
-			;;
-		*)
-			set_enum_config
-			;;	
-	esac
+    read -p "Do you want to change your configuration? [y/N] >> " getopt
+
+    case $getopt in
+        [yY]|[yY][eE][sS])
+            change_config
+            ;;
+        [nN]|[nN][oO])
+            clear
+            show_menu
+            ;;
+        *)
+            set_enum_config
+            ;;
+    esac
 }
+
+function change_config
+{
+    show_banner
+    echo -e "Change what?:
+
+[1] Target IP Address (current $HOST)
+[2] Target Ports (current 1-$PORT)
+[3] Target Domain (current $DOMAIN)
+[4] Back to Main Menu
+"
+    read -p ">> " getopt
+
+    case $getopt in
+        1)
+            ch_addr
+            ;;
+        2)
+            ch_port
+            ;;
+        3)
+            ch_domain
+			;;
+
+        4)
+            show_menu
+            ;;
+        *)
+            change_config
+            ;;
+    esac
+}
+
