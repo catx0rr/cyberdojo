@@ -72,6 +72,9 @@ function show_menu
 	# Load new conf
 	. $path/config/recon.conf
 	
+	# Validate configuration file
+	validate_config	
+
 	show_banner
 	show_selection	
 
@@ -160,5 +163,19 @@ function change_config
             change_config
             ;;
     esac
+}
+
+function validate_config
+{
+	show_banner
+
+	# validate the host configuration
+	host_err
+
+	# validate the end port configuration	
+	port_err
+
+	# validate the web domain configuration
+	dom_err
 }
 

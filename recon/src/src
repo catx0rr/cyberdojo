@@ -58,5 +58,89 @@ function ch_domain
 	fi
 }
 
+function host_err
+{
+	# Check if configuration file has valid hosts.
+	HOSTERR=$(grep -oi '^host=\(\.*\).*' $path/config/recon.conf | wc -l)
 
+    if [[ $HOSTERR -eq 0 ]]; then
+        echo -e "[-] ERROR: No hosts detected on the configuration file.
+"
+		read -p ">> " getopt
 
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+	
+	elif [[ $HOSTERR -ge 2 ]]; then
+		echo -e "[-] ERROR: Two or more hosts detected on the configuration file.
+"	
+		read -p ">> " getopt
+
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+	fi
+}
+
+function port_err
+{
+	# Check if configuration file has valid ports.
+	PORTERR=$(grep -oi '^port=\(\.*\).*' $path/config/recon.conf | wc -l)
+	
+	if [[ $PORTERR -eq 0 ]]; then
+		echo -e "[-] ERROR: No end ports detected on the configuration file.
+"
+		read -p ">> " getopt
+	
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+
+	elif [[ $PORTERR -ge 2 ]]; then
+		echo -e "[-] ERROR: Two or more end ports detected on the configuration file.
+"
+		read -p ">> " getopt
+
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+	fi
+}
+
+function dom_err
+{
+	# Check if the configuration file has valid domains.
+	DOMERR=$(grep -oi '^domain=\(\.*\).*' $path/config/recon.conf | wc -l)
+
+	if [[ $DOMERR -eq 0 ]]; then
+		echo -e "[-] ERROR: No web domain detected on the configuration file.
+"
+		read -p ">> " getopt
+
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+
+	elif [[ $DOMERR -ge 2 ]]; then
+		echo -e "[-] ERROR: Two or more web domains detected on the configuration file.
+"
+		read -p ">> " getopt
+		
+		case $getopt in
+			*)
+				exit 0
+				;;
+		esac
+	fi
+}
