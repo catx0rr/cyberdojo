@@ -1,0 +1,182 @@
+#!/bin/bash
+
+function start_enum_domain
+{
+	show_banner
+	echo -e "[*] Starting enumeration for $DOMAIN..\n"
+	read -p "[*] Enumerate $DOMAIN? [y/N] >> " getopt
+
+	case $getopt in
+		[yY]|[yY][eE][sS])
+			enumerate_domain
+			;;
+		[nN]|[nN][oO])
+			clear
+			show_menu
+			;;
+		*)
+			start_enum_domain
+			;;
+	esac	
+}
+
+function start_ping_sweep
+{
+	show_banner
+	echo -e "[*] Starting ping sweep for $HOST.0..\n" | cut -d'.' -f1-3,5-7
+	read -p "[*] Perform ping sweep? [y/N] >> " getopt
+
+	case $getopt in
+		[yY]|[yY][eE][sS])
+			ping_sweep
+			;;
+		[nN]|[nN][oO])
+			clear
+			show_menu
+			;;
+		*)
+			start_ping_sweep
+			;;
+	esac
+}
+
+function start_port_scan
+{
+	show_banner
+	echo -e "[*] Start port scan for $HOST..\n" 
+	read -p "[*] Perform port scan? (1-$PORT)? [y/N] >> " getopt
+
+	case $getopt in
+		[yY]|[yY][eE][sS])
+			scanning_options
+			;;
+		[nN]|[nN][oO])
+			clear
+			show_menu
+			;;
+		*)
+			start_port_scan
+			;;
+
+	esac
+}
+
+function scanning_options
+{
+	read -p "[*] Show only open ports? [y/n] >> " scan_opt
+
+	case $scan_opt in
+		[yY]|[yY][eE][sS])
+			OPEN='yes'
+			port_scan
+			;;
+		[nN]|[nN][oO])
+			OPEN='no'
+			port_scan
+			;;
+		*)
+			scanning_options
+			;;
+	esac
+}
+
+function enumerate_domain
+{
+	# Download index of target domain
+	sleep .25
+	echo -e "\n[+] Downloading index.."
+	mkdir -p $path/output/$DOMAIN 2>/dev/null
+	wget $DOMAIN -O $path/output/$DOMAIN/$DOMAIN.html -q
+	sleep .75
+
+	# Get the subdomains captured 
+	sleep .25	
+	echo -e "[+] Scraping for subdomains.."
+	grep -o '[A-Za-z0-9_\.-]'*$DOMAIN $path/output/$DOMAIN/$DOMAIN.html \
+	| sort -u >> $path/output/$DOMAIN/subdomains.$DOMAIN.out
+	sleep .75
+
+	# Translate scraped subdomains to IPs
+	sleep .25
+	echo -e "[+] Capturing IP addresses..\n"
+	
+	for i in $(cat $path/output/$DOMAIN/subdomains.$DOMAIN.out); do host $i; done \
+	| grep "has address" | awk '{print $4}' | sort -u | tee -a $path/output/$DOMAIN/ip.$DOMAIN.out
+
+	echo -e "\n[+] Done. Data saved on $(pwd)/output/$DOMAIN/
+	"
+
+	read -p ">> " getopt
+	
+	case $getopt in
+		*)
+			clear
+			show_menu
+			;;
+	esac
+}
+
+function ping_sweep
+{
+	mkdir -p $path/output/pingsweep
+	SUBNET=$(echo $HOST | cut -d'.' -f1-3)
+
+	sleep .25
+	echo -e "[+] Sweeping the subnet for live hosts..\n"
+	sleep .75
+	echo -e "Live Hosts on $SUBNET.0:\n" >> $path/output/pingsweep/subnet.$SUBNET.out
+	
+	for i in {1..254}; do ping -c1 $SUBNET.$i | tr \\n ' ' | awk '/1 received/ {print Host $2 is up}' & done \
+	| tee -a $path/output/pingsweep/subnet.$SUBNET.out
+
+	echo -e "\n[+] Done. Data saved on $(pwd)/output/pingsweep
+	"
+	
+	read -p ">> " getopt
+
+	case $getopt in
+		*)
+			clear
+			show_menu
+			;;
+	esac
+}
+
+function port_scan
+{
+	mkdir -p $path/output/portscan
+	
+	sleep .25
+	echo -e "[+] Scanning for Open Ports..\n"
+	sleep .75
+	
+	# Check for scanning opts
+	
+	if [[ $OPEN == 'yes' ]]; then
+
+		echo -e "Open Ports on host $HOST:\n" >> $path/output/portscan/ip-open.$HOST.out
+
+		for i in `seq 1 $PORT`; do (echo > /dev/tcp/$HOST/"$i") > /dev/null \
+		2>&1 && echo "Port is open: $i"; done \
+		| tee -a $path/output/portscan/ip-open.$HOST.out
+	else
+
+		echo -e "Ports on host $HOST:\n" >> $path/output/portscan/ip-open-closed.$HOST.out
+
+		for i in `seq 1 $PORT`; do (echo > /dev/tcp/$HOST/"$i") > /dev/null \
+		2>&1 && echo "Port is open: $i" || echo "Port is closed: $i"; done \
+		| tee -a $path/output/portscan/ip-open-closed.$HOST.out
+	fi
+
+	echo -e "\n[+] Done. Data saved on $(pwd)/output/portscan
+	"
+	
+	read -p ">> " getopt
+	
+	case $getopt in
+		*)
+			clear
+			show_menu
+			;;
+	esac
+}

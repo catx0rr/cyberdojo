@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #
 #
 #	╦═╗┌─┐┌─┐┌─┐┌┐┌ ┌─┐┬ ┬
@@ -17,20 +16,29 @@
 #	to attack sites, networks, domain is illegal without mutual consent.
 #	I have no liability for any misuse. 
 #
+#	HELP:
+#
+#	type the following to move across menu.
+#
+#	config - View Configuration
+#	enum - Enumerate a Domain
+#	psw	- Start a ping sweep
+#	psc - Start a port scan
+#	help - Help Screen
+#	exit - Quit recon.sh
 #
 #
 
-path=$(dirname `which $0`)
+path=`dirname $0`
 
-. $path/src/bnr
 . $path/src/lib
-. $path/src/proc
-. $path/conf/recon.conf
+. $path/src/src
+. $path/src/scripts
+. $path/config/recon.conf
 
 
 function main
 {
-	show_banner
 	show_menu
 }
 

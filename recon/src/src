@@ -1,0 +1,62 @@
+#!/bin/bash
+
+function ch_addr
+{
+	show_banner
+	echo -e "[+] Changing IP Address..\n"
+	read -p "[*] Enter New IP address >> " getopt
+	
+	# Validate and change the last occurence of HOST IP from the config file
+	if [[ $getopt =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+		tac $path/config/recon.conf | sed "0,/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/s//$getopt/" \
+		| tac | tee $path/config/recon.conf
+		clear
+		set_enum_config
+		
+	else
+		echo -e "\n[-] Incorrect IP Address Format."
+		sleep 0.75
+		ch_addr
+	fi
+}
+
+function ch_port
+{
+	show_banner
+	echo -e "[+] Changing Port..\n"
+	read -p "[*] Enter a desired end port (2-65535) >> " getopt
+
+	# Validate and change the last occurence of PORT from the config file
+	if [[ $getopt =~ ^[0-9]{1,5}$ ]]; then
+		tac $path/config/recon.conf | sed "0,/[0-9]\{1,5\}/s//$getopt/" \
+		| tac | tee $path/config/recon.conf
+		clear
+		set_enum_config
+	else
+		echo -e "\n[-] Incorrect Port Number specified."
+		sleep 0.75
+		ch_port
+	fi
+}
+
+function ch_domain
+{
+	show_banner
+	echo -e "[+] Changing Website Domain..\n"
+	read -p "[*] Enter a desired domain name: (i.e. cisco.com) >> " getopt
+
+	# Validate and change the last occurence of the domain from the config file
+	if [[ $getopt =~ ^([A-Za-z0-9_-])+(\.[A-Za-z]{2,5})+(\.[A-Za-z]{2,5})?$ ]]; then
+		tac $path/config/recon.conf | sed -r "0,/([A-Za-z0-9_-])+(\.[A-Za-z]{2,5})+(\.[A-Za-z]{2,5})?/s//$getopt/" \
+		| tac | tee $path/config/recon.conf
+		clear
+		set_enum_config
+	else
+		echo -e "\n[-] Incorrect Domain specified."
+		sleep 0.75
+		ch_domain
+	fi
+}
+
+
+
