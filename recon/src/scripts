@@ -160,12 +160,23 @@ function port_scan
 		2>&1 && echo "Port is open: $i"; done \
 		| tee -a $path/output/portscan/ip-open.$HOST.out
 	else
+		read -p "[!] Showing all ports generate a huge file. Proceed? [y/N] >> " getopt
 
-		echo -e "Ports on host $HOST:\n" >> $path/output/portscan/ip-open-closed.$HOST.out
+		case $getopt in
+			[yY]|[yY][eE][sS])	
+				echo -e "Ports on host $HOST:\n" >> $path/output/portscan/ip-open-closed.$HOST.out
 
-		for i in `seq 1 $PORT`; do (echo > /dev/tcp/$HOST/"$i") > /dev/null \
-		2>&1 && echo "Port is open: $i" || echo "Port is closed: $i"; done \
-		| tee -a $path/output/portscan/ip-open-closed.$HOST.out
+				for i in `seq 1 $PORT`; do (echo > /dev/tcp/$HOST/"$i") > /dev/null \
+				2>&1 && echo "Port is open: $i" || echo "Port is closed: $i"; done \
+				| tee -a $path/output/portscan/ip-open-closed.$HOST.out
+				;;
+			[nN]|[nN][oO])
+				port_scan
+				;;
+			*)
+				port_scan
+				;;
+		esac
 	fi
 
 	echo -e "\n[+] Done. Data saved on $(pwd)/output/portscan
